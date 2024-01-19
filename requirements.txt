@@ -1,3 +1,4 @@
 rasa
 #rasa init --no-prompt
 #rasa shell
+#rasa train
