@@ -1,35 +1,24 @@
-const chatLog = document.getElementById('chatLog');
-const userInput = document.getElementById('userInput');
-
-function sendMessage() {
-    const userMessage = userInput.value;
-
-    // Display user message in the chat log
-    appendMessage('User', userMessage);
-
-    // Simulate AI response (replace with actual AI logic)
-    const aiResponse = simulateAiResponse(userMessage);
-
-    // Display AI response in the chat log after a short delay
-    setTimeout(() => {
-        appendMessage('AI', aiResponse);
-    }, 500);
-
-    // Clear the user input
-    userInput.value = '';
-}
-
-function appendMessage(sender, message) {
-    const messageElement = document.createElement('div');
-    messageElement.className = sender.toLowerCase();
-    messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
-    chatLog.appendChild(messageElement);
-
-    // Scroll to the bottom of the chat log
-    chatLog.scrollTop = chatLog.scrollHeight;
-}
-
 function simulateAiResponse(userMessage) {
-    // Replace this with actual AI logic (e.g., using an API call to a chatbot service)
-    return `AI response to "${userMessage}"`;
+    const apiUrl = 'http://localhost:5005/model/parse'; // Update with your Rasa API endpoint
+
+    // Make a POST request to Rasa API
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            text: userMessage,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Extract the response from Rasa and display it in the chat log
+        const aiResponse = data && data.intent && data.intent.name ? data.intent.name : 'Fallback'; // Adjust based on your Rasa response format
+        appendMessage('AI', aiResponse);
+    })
+    .catch(error => {
+        console.error('Error communicating with Rasa:', error);
+        appendMessage('AI', 'Error communicating with Rasa');
+    });
 }
